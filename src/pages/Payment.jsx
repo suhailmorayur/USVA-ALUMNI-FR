@@ -131,7 +131,8 @@ const Payment = () => {
           state: { 
             pdfUrl: card.pdfUrl, 
             membershipId: card.membershipId,
-            fullName: updatedMember.fullName 
+            fullName: updatedMember.fullName,
+            memberId: updatedMember._id
           }
         });
       } else {

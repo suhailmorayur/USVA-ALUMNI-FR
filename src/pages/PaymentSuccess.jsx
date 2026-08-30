@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import { CheckCircle2, ArrowRight, Download, Mail, Award } from 'lucide-react';
 
 const PaymentSuccess = () => {
   const location = useLocation();
   
   // Extract state passed from redirection
-  const { pdfUrl, membershipId, fullName } = location.state || {};
+  const { pdfUrl, membershipId, fullName, memberId } = location.state || {};
 
   return (
     <div className="bg-slate-50 min-h-screen py-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
@@ -45,10 +46,10 @@ const PaymentSuccess = () => {
         </div>
 
         {/* Download PDF button */}
-        {pdfUrl ? (
+        {(memberId || pdfUrl) ? (
           <div className="space-y-3">
             <a
-              href={pdfUrl}
+              href={memberId ? `${(axios.defaults.baseURL || '').replace(/\/$/, '')}/api/members/${memberId}/download-portrait` : pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full inline-flex justify-center items-center gap-2 bg-teal-700 hover:bg-teal-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition transform hover:-translate-y-0.5 text-lg"

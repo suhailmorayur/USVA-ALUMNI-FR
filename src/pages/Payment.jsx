@@ -190,18 +190,32 @@ const Payment = () => {
             <span className="text-[10px] bg-teal-600 px-2 py-0.5 rounded text-white font-bold inline-block uppercase">UPI DIRECT PAY</span>
           </div>
 
-          {/* Interactive QR / Mobile Apps Action */}
-          <div className="flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center block">
-              Scan QR code with GPay, PhonePe, Paytm, or BHIM
-            </span>
+          {/* Interactive QR / GPay Instructions */}
+          <div className="flex flex-col items-center justify-center p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
             
+            {/* Step-by-step Instructions */}
+            <div className="w-full text-slate-700 space-y-2.5 text-xs">
+              <span className="font-extrabold text-slate-800 uppercase tracking-wider block border-b pb-1 text-center">Payment Steps</span>
+              
+              <div className="flex gap-2">
+                <span className="bg-teal-700 text-white w-5 h-5 rounded-full flex items-center justify-center shrink-0 font-bold text-[10px]">1</span>
+                <p className="leading-relaxed">Scan the QR code below using any UPI app (GPay, PhonePe, Paytm, etc.).</p>
+              </div>
+
+              <div className="flex gap-2">
+                <span className="bg-teal-700 text-white w-5 h-5 rounded-full flex items-center justify-center shrink-0 font-bold text-[10px]">2</span>
+                <p className="leading-relaxed flex-grow">
+                  Or copy the Google Pay (GPay) number below and send the exact fee directly.
+                </p>
+              </div>
+            </div>
+
             <div className="p-2 bg-white rounded-lg border shadow-sm">
               <QRCodeSVG value={upiLink} size={150} level="M" />
             </div>
 
             {/* GPay Phone Number & Copy Option */}
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1 w-full pt-1">
               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Google Pay (GPay) Number</span>
               <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border shadow-xs">
                 <span className="text-sm font-extrabold text-slate-800 font-mono">+91 73562 26704</span>
@@ -219,12 +233,11 @@ const Payment = () => {
               </div>
             </div>
 
-            <button
-              onClick={handlePayNowClick}
-              className="w-full bg-teal-700 hover:bg-teal-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition flex justify-center items-center gap-2"
-            >
-              <ShieldCheck className="w-5 h-5" /> PAY NOW (OPEN UPI APP)
-            </button>
+            {/* Upload Instruction */}
+            <div className="w-full text-center text-[10px] text-slate-500 font-semibold border-t pt-3">
+              Take a screenshot of the successful payment receipt, upload it below, and click the confirmation button to activate your card.
+            </div>
+
           </div>
 
           {/* Direct Confirmation Portal */}

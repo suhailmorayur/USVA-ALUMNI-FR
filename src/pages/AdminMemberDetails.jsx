@@ -280,7 +280,7 @@ const AdminMemberDetails = () => {
                   <Download className="w-4 h-4" /> Download Portrait
                 </a>
                 <a
-                  href={`${axios.defaults.baseURL || ''}/api/admin/members/${member._id}/download-landscape?token=${adminToken}`}
+                  href={`${(axios.defaults.baseURL || '').replace(/\/$/, '')}/api/admin/members/${member._id}/download-landscape?token=${adminToken}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 px-4 py-2 rounded-lg font-bold text-xs flex items-center gap-1 transition"

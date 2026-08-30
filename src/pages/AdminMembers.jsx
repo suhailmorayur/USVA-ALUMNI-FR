@@ -316,7 +316,7 @@ const AdminMembers = () => {
                             </Link>
                             {member.membershipId && (
                               <a
-                                href={`${axios.defaults.baseURL || ''}/api/admin/members/${member._id}/download-landscape?token=${adminToken}`}
+                                href={`${(axios.defaults.baseURL || '').replace(/\/$/, '')}/api/admin/members/${member._id}/download-landscape?token=${adminToken}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 font-bold px-3 py-1.5 rounded-lg text-xs inline-flex items-center gap-1 transition"

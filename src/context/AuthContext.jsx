@@ -1,6 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
+// Set default axios base URL synchronously on load
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || '';
+
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
@@ -10,10 +13,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken') || '');
 
-  // Set default axios base URL
-  useEffect(() => {
-    axios.defaults.baseURL = import.meta.env.VITE_API_URL || '';
-  }, []);
 
   // Update Axios default auth header when admin token changes
   useEffect(() => {

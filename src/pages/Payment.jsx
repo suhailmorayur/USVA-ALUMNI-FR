@@ -14,8 +14,8 @@ const Payment = () => {
 
   const [loading, setLoading] = useState(false);
   const [fee, setFee] = useState(500);
-  const [upiId, setUpiId] = useState('usva@upi');
-  const [payeeName, setPayeeName] = useState('USVA Alumni');
+  const [upiId, setUpiId] = useState('bdllubaid@okhdfcbank');
+  const [payeeName, setPayeeName] = useState('Ubaidulla A');
   const [error, setError] = useState('');
   const [member, setMember] = useState(null);
 

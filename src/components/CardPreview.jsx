@@ -47,45 +47,28 @@ const CardPreview = ({ member, validity = 'Mar 2028', side = 'front', scale = 1,
             }}
           />
 
-          {/* Student Photo Rounded Container Box (Reference position and dimensions) */}
+          {/* Student Photo Rounded Container Box (No white border, 28px rounded corners on all 4 sides) */}
           <div
-            className="absolute bg-white overflow-hidden shadow-sm flex items-center justify-center"
+            className="absolute overflow-hidden bg-slate-200"
             style={{
               left: '14.57%',   // 93 / 638
               top: '20.91%',    // 210 / 1004
               width: '32.75%',   // 209 / 638
               height: '27.29%',  // 274 / 1004
-              borderRadius: '28px',
-              padding: '8px'    // 8px white border inside
+              borderRadius: '28px'
             }}
           >
-            <div className="w-full h-full rounded-[20px] overflow-hidden bg-slate-200">
-              {member.photoUrl ? (
-                <img
-                  src={member.photoUrl}
-                  alt={member.fullName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="flex items-center justify-center w-full h-full text-slate-400 text-[10px]">
-                  No Photo
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Validity Text Overlay */}
-          <div
-            className="absolute text-white font-semibold text-center uppercase tracking-wide flex items-center justify-center pointer-events-none"
-            style={{
-              left: '60.81%',
-              top: '13.65%',
-              width: '34.48%',
-              height: '6.18%',
-              fontSize: '1.6cqw'
-            }}
-          >
-            Valid up to {validity}
+            {member.photoUrl ? (
+              <img
+                src={member.photoUrl}
+                alt={member.fullName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="flex items-center justify-center w-full h-full text-slate-400 text-[10px]">
+                No Photo
+              </div>
+            )}
           </div>
 
           {/* Student Name (Reference position and font-size 40px) */}

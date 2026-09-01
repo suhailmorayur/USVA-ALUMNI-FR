@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Search, Loader2, Award, Clock, CheckCircle2, ShieldAlert, XCircle, ArrowRight } from 'lucide-react';
+import { Search, Loader2, Award, Clock, CheckCircle2, ShieldAlert, XCircle, ArrowRight, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Status = () => {
@@ -34,18 +34,26 @@ const Status = () => {
 
   // Timeline render helpers
   const getStatusDetails = (appStatus, payStatus) => {
+    if (payStatus === 'failed') {
+      return {
+        title: 'Payment Failed',
+        color: 'text-red-700 bg-red-50 border-red-200',
+        desc: 'Payment failed. Please try again.'
+      };
+    }
+
     switch (appStatus) {
       case 'draft':
         return {
           title: 'Draft Saved',
           color: 'text-slate-600 bg-slate-50 border-slate-200',
-          desc: 'Your profile has been created, but payment has not been initiated. Please log in and complete your payment.'
+          desc: 'Your profile has been created, but payment has not been initiated. Please complete your payment.'
         };
       case 'payment_pending':
         return {
           title: 'Payment Pending',
           color: 'text-amber-600 bg-amber-50 border-amber-200',
-          desc: 'Registration profile saved. Awaiting secure UPI payment check. Click dashboard to pay.'
+          desc: 'Registration profile saved. Awaiting secure payment confirmation. Click below to complete your payment.'
         };
       case 'payment_completed':
         return {
@@ -65,13 +73,13 @@ const Status = () => {
         return {
           title: 'Membership Approved ✓',
           color: 'text-teal-700 bg-teal-50 border-teal-200',
-          desc: 'Congratulations! Your alumni membership is approved. Your digital card has been sent to your email.'
+          desc: 'Congratulations! Your alumni membership is approved. Your digital card is ready.'
         };
       case 'rejected':
         return {
           title: 'Application Rejected',
           color: 'text-red-700 bg-red-50 border-red-200',
-          desc: 'Your application was rejected during review. Please log in to your student dashboard to see details and make corrections.'
+          desc: 'Your application was rejected during review. Please contact administration for further details.'
         };
       default:
         return {
@@ -145,6 +153,10 @@ const Status = () => {
             {/* Display block */}
             {(() => {
               const details = getStatusDetails(result.applicationStatus, result.paymentStatus);
+              const isPaymentPending = result.paymentStatus === 'pending' || result.applicationStatus === 'payment_pending';
+              const isPaymentFailed = result.paymentStatus === 'failed';
+              const isApproved = ['approved', 'card_generated', 'email_sent'].includes(result.applicationStatus);
+
               return (
                 <div className="space-y-4">
                   <div className={`p-4 rounded-xl border text-sm ${details.color}`}>
@@ -170,17 +182,27 @@ const Status = () => {
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center border shadow-sm ${
                         result.paymentStatus === 'paid' 
                           ? 'bg-teal-600 border-white text-white' 
+                          : isPaymentFailed
+                          ? 'bg-red-600 border-white text-white'
                           : 'bg-white border-slate-200 text-slate-400'
                       }`}>
-                        <CheckCircle2 className="w-4 h-4" />
+                        {isPaymentFailed ? <XCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
                       </div>
-                      <span className={`text-[10px] font-bold ${result.paymentStatus === 'paid' ? 'text-slate-600' : 'text-slate-400'}`}>Paid</span>
+                      <span className={`text-[10px] font-bold ${
+                        result.paymentStatus === 'paid' 
+                          ? 'text-slate-600' 
+                          : isPaymentFailed
+                          ? 'text-red-600'
+                          : 'text-slate-400'
+                      }`}>
+                        {isPaymentFailed ? 'Failed' : 'Paid'}
+                      </span>
                     </div>
 
                     {/* Step 3: Verified */}
                     <div className="flex flex-col items-center gap-1.5 flex-1">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center border shadow-sm ${
-                        ['approved', 'card_generated', 'email_sent'].includes(result.applicationStatus)
+                        isApproved
                           ? 'bg-teal-600 border-white text-white'
                           : result.applicationStatus === 'under_review' || result.applicationStatus === 'payment_completed'
                           ? 'bg-amber-500 border-white text-white animate-pulse'
@@ -189,7 +211,7 @@ const Status = () => {
                         <CheckCircle2 className="w-4 h-4" />
                       </div>
                       <span className={`text-[10px] font-bold ${
-                        ['approved', 'card_generated', 'email_sent', 'under_review', 'payment_completed'].includes(result.applicationStatus) 
+                        isApproved || result.applicationStatus === 'under_review' || result.applicationStatus === 'payment_completed' 
                           ? 'text-slate-600' 
                           : 'text-slate-400'
                       }`}>Verify</span>
@@ -212,13 +234,36 @@ const Status = () => {
                     </div>
                   </div>
 
-                  <div className="border-t border-slate-100 pt-6 flex justify-center">
-                    <Link
-                      to="/download"
-                      className="text-teal-700 hover:text-teal-800 text-xs font-bold inline-flex items-center gap-1 group"
-                    >
-                      Go to Card Download Page <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
-                    </Link>
+                  {/* Actions Area */}
+                  <div className="border-t border-slate-100 pt-4 space-y-3">
+                    {(isPaymentPending || isPaymentFailed) && result._id && (
+                      <Link
+                        to={`/payment?id=${result._id}`}
+                        className="w-full bg-teal-700 hover:bg-teal-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition flex justify-center items-center gap-2 text-sm uppercase tracking-wider"
+                      >
+                        <CreditCard className="w-4 h-4" />
+                        {isPaymentFailed ? 'REPAY NOW' : 'COMPLETE PAYMENT / REPAY NOW'}
+                      </Link>
+                    )}
+
+                    {isApproved && (
+                      <Link
+                        to="/download"
+                        className="w-full bg-teal-700 hover:bg-teal-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition flex justify-center items-center gap-2 text-sm uppercase tracking-wider"
+                      >
+                        <Award className="w-4 h-4" />
+                        Download Membership Card
+                      </Link>
+                    )}
+
+                    <div className="flex justify-center pt-2">
+                      <Link
+                        to="/download"
+                        className="text-teal-700 hover:text-teal-800 text-xs font-bold inline-flex items-center gap-1 group"
+                      >
+                        Go to Card Download Page <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );

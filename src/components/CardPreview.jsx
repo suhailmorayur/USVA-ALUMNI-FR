@@ -114,7 +114,7 @@ const CardPreview = ({ member, validity = 'Mar 2028', side = 'front', scale = 1,
           >
 
             {/* Place Row */}
-            <div className="flex items-center" style={{ fontSize: '3.91cqw', height: '4.8`cqw' }}>
+            <div className="flex items-center" style={{ fontSize: '3.91cqw', height: '4.8cqw' }}>
               <span className="text-slate-900" style={{ width: '17cqw' }}>Place</span>
               <span className="text-slate-900" style={{ width: '5cqw' }}>:</span>
               <span className="truncate flex-1 font-bold text-black">{member.place}</span>
@@ -124,7 +124,7 @@ const CardPreview = ({ member, validity = 'Mar 2028', side = 'front', scale = 1,
             <div className="flex items-center" style={{ fontSize: '3.91cqw', height: '4.8cqw' }}>
               <span className="text-slate-900" style={{ width: '17cqw' }}>Ad. No</span>
               <span className="text-slate-900" style={{ width: '5cqw' }}>:</span>
-              <span className="truncate flex-1 font-bold text-black">{member.admissionNumber}</span>
+              <span className="truncate flex-1 font-bold text-black">{member.admissionNumber || '-'}</span>
             </div>
 
             {/* Phone Row */}
@@ -133,6 +133,15 @@ const CardPreview = ({ member, validity = 'Mar 2028', side = 'front', scale = 1,
               <span className="text-slate-900" style={{ width: '5cqw' }}>:</span>
               <span className="truncate flex-1 font-bold text-black">{member.phone}</span>
             </div>
+
+            {/* Mem. ID Row */}
+            {member.membershipId && (
+              <div className="flex items-center" style={{ fontSize: '3.91cqw', height: '4.8cqw' }}>
+                <span className="text-slate-900" style={{ width: '17cqw' }}>Mem. ID</span>
+                <span className="text-slate-900" style={{ width: '5cqw' }}>:</span>
+                <span className="truncate flex-1 font-bold text-black">{member.membershipId}</span>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -250,7 +259,7 @@ const CardPreview = ({ member, validity = 'Mar 2028', side = 'front', scale = 1,
           <div className="flex items-center" style={{ fontSize: '18px', height: '24px' }}>
             <span style={{ width: '90px' }}>Ad. No</span>
             <span style={{ width: '20px' }}>:</span>
-            <span className="truncate flex-1 font-bold text-black">{member.admissionNumber}</span>
+            <span className="truncate flex-1 font-bold text-black">{member.admissionNumber || '-'}</span>
           </div>
 
           {/* Phone Row */}
@@ -259,6 +268,15 @@ const CardPreview = ({ member, validity = 'Mar 2028', side = 'front', scale = 1,
             <span style={{ width: '20px' }}>:</span>
             <span className="truncate flex-1 font-bold text-black">{member.phone}</span>
           </div>
+
+          {/* Mem. ID Row */}
+          {member.membershipId && (
+            <div className="flex items-center" style={{ fontSize: '18px', height: '24px' }}>
+              <span style={{ width: '90px' }}>Mem. ID</span>
+              <span style={{ width: '20px' }}>:</span>
+              <span className="truncate flex-1 font-bold text-black">{member.membershipId}</span>
+            </div>
+          )}
         </div>
       </div>
     );

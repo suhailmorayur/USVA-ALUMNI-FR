@@ -179,7 +179,7 @@ const Payment = () => {
               <span className="font-bold text-slate-500 uppercase tracking-wider block mb-1">Applying For:</span>
               <div className="flex justify-between font-bold text-slate-800">
                 <span>{member.fullName}</span>
-                <span className="text-slate-500 font-medium">Ad. No: {member.admissionNumber}</span>
+                <span className="text-slate-500 font-medium">Ad. No: {member.admissionNumber || 'N/A'}</span>
               </div>
             </div>
           )}

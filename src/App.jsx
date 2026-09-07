@@ -64,6 +64,7 @@ const App = () => {
           </Route>
 
           {/* Standalone Public Verification Route (No default header/footer) */}
+          <Route path="/verify/*" element={<Verify />} />
           <Route path="/verify/:membershipId" element={<Verify />} />
 
           {/* Standalone Admin Login Route */}

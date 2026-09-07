@@ -4,21 +4,23 @@ import { Search, Loader2, Award, Clock, CheckCircle2, ShieldAlert, XCircle, Arro
 import { Link } from 'react-router-dom';
 
 const Status = () => {
-  const [admissionNumber, setAdmissionNumber] = useState('');
+  const [searchType, setSearchType] = useState('admissionNumber'); // 'admissionNumber' or 'email'
+  const [searchValue, setSearchValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!admissionNumber.trim()) return;
+    if (!searchValue.trim()) return;
 
     setLoading(true);
     setError('');
     setResult(null);
 
     try {
-      const res = await axios.get(`/api/members/status-check?admissionNumber=${encodeURIComponent(admissionNumber.trim())}`);
+      const paramName = searchType === 'email' ? 'email' : 'admissionNumber';
+      const res = await axios.get(`/api/members/status-check?${paramName}=${encodeURIComponent(searchValue.trim())}`);
       if (res.data.success) {
         setResult(res.data.data);
       } else {
@@ -26,7 +28,7 @@ const Status = () => {
       }
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || 'No active registration found for this admission number.');
+      setError(err.response?.data?.message || 'No active registration found matching the search details.');
     } finally {
       setLoading(false);
     }
@@ -104,17 +106,46 @@ const Status = () => {
         {/* Search Panel */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <form onSubmit={handleSearch} className="space-y-4">
+            
+            {/* Search Type Selector */}
+            <div className="flex gap-4 p-1 bg-slate-100 rounded-lg">
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchType('admissionNumber');
+                  setSearchValue('');
+                  setError('');
+                }}
+                className={`flex-1 text-center py-2 text-xs font-bold uppercase rounded-md tracking-wider transition ${searchType === 'admissionNumber' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                By Ad. No
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchType('email');
+                  setSearchValue('');
+                  setError('');
+                }}
+                className={`flex-1 text-center py-2 text-xs font-bold uppercase rounded-md tracking-wider transition ${searchType === 'email' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                By Email
+              </button>
+            </div>
+
             <div className="space-y-1">
-              <label htmlFor="adNumber" className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Academy Admission Number</label>
+              <label htmlFor="searchValue" className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                {searchType === 'email' ? 'Registered Email Address' : 'Academy Admission Number'}
+              </label>
               <div className="flex gap-2">
                 <div className="relative flex-grow">
                   <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
                   <input
-                    type="text"
-                    id="adNumber"
-                    value={admissionNumber}
-                    onChange={(e) => setAdmissionNumber(e.target.value)}
-                    placeholder="Enter your admission number"
+                    type={searchType === 'email' ? 'email' : 'text'}
+                    id="searchValue"
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    placeholder={searchType === 'email' ? 'e.g. suhail@example.com' : 'e.g. 1098'}
                     className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 transition font-medium"
                   />
                 </div>

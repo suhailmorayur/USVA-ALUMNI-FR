@@ -66,7 +66,7 @@ const Home = () => {
     e.preventDefault();
     setError('');
 
-    if (!fullName || !place || !admissionNumber || !phone || !email) {
+    if (!fullName || !place || !phone || !email) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -242,15 +242,17 @@ const Home = () => {
 
                 {/* Admission Number */}
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Admission Number</label>
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Admission Number</label>
+                    <span className="text-[10px] text-slate-400 font-medium">(Optional)</span>
+                  </div>
                   <div className="relative">
                     <GraduationCap className="w-4.5 h-4.5 text-slate-400 absolute left-3 top-3.5" />
                     <input 
                       type="text"
-                      required
                       value={admissionNumber}
                       onChange={(e) => setAdmissionNumber(e.target.value)}
-                      placeholder="e.g. 1098"
+                      placeholder="e.g. 1098 (Optional if forgotten)"
                       className="w-full bg-white border border-slate-200 focus:border-teal-700 text-slate-800 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-700/10 transition text-sm font-semibold"
                     />
                   </div>

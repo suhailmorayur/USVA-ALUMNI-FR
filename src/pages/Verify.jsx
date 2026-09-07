@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { CheckCircle2, XCircle, ShieldAlert, Award, Loader2, Calendar } from 'lucide-react';
 
 const Verify = () => {
-  const { membershipId } = useParams();
+  const params = useParams();
+  const location = useLocation();
+  const rawId = params.membershipId || params['*'] || location.pathname.replace(/^\/verify\/?/, '');
+  const membershipId = decodeURIComponent(rawId).trim();
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');

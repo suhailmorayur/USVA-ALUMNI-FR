@@ -18,7 +18,8 @@ import {
   User, 
   FileText,
   AlertTriangle,
-  Trash2
+  Trash2,
+  Edit3
 } from 'lucide-react';
 
 const AdminMemberDetails = () => {
@@ -36,6 +37,19 @@ const AdminMemberDetails = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [previewLayout, setPreviewLayout] = useState('portrait');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // Edit details state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    fullName: '',
+    admissionNumber: '',
+    place: '',
+    phone: '',
+    email: '',
+    sand: { umari: false, faizy: false }
+  });
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState('');
 
   const handleDelete = async () => {
     setActionLoading(true);
@@ -152,6 +166,67 @@ const AdminMemberDetails = () => {
       alert(err.response?.data?.message || 'Resending failed');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleOpenEditModal = () => {
+    if (!data?.member) return;
+    const m = data.member;
+    setEditFormData({
+      fullName: m.fullName || '',
+      admissionNumber: m.admissionNumber || '',
+      place: m.place || '',
+      phone: m.phone || '',
+      email: m.email || '',
+      sand: {
+        umari: (m.sand || []).includes('umari'),
+        faizy: (m.sand || []).includes('faizy')
+      }
+    });
+    setEditError('');
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!editFormData.fullName.trim() || !editFormData.place.trim() || !editFormData.phone.trim() || !editFormData.email.trim()) {
+      setEditError('Please fill in Full Name, Place, Phone, and Email.');
+      return;
+    }
+
+    setEditSaving(true);
+    setEditError('');
+
+    const selectedSanads = [];
+    if (editFormData.sand.umari) selectedSanads.push('umari');
+    if (editFormData.sand.faizy) selectedSanads.push('faizy');
+
+    try {
+      const payload = {
+        fullName: editFormData.fullName.trim(),
+        admissionNumber: editFormData.admissionNumber.trim(),
+        place: editFormData.place.trim(),
+        phone: editFormData.phone.trim(),
+        email: editFormData.email.trim().toLowerCase(),
+        sand: selectedSanads
+      };
+
+      const res = await axios.put(`/api/admin/members/${id}`, payload, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+
+      if (res.data.success) {
+        alert(res.data.message || 'Details updated successfully.');
+        setShowEditModal(false);
+        fetchDetails();
+      } else {
+        setEditError(res.data.message || 'Failed to update details.');
+      }
+    } catch (err) {
+      console.error(err);
+      setEditError(err.response?.data?.message || 'Server error updating member details.');
+    } finally {
+      setEditSaving(false);
     }
   };
 
@@ -305,7 +380,18 @@ const AdminMemberDetails = () => {
           
           {/* Column 1: Member Data */}
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6 lg:col-span-2">
-            <h3 className="text-base font-bold text-slate-800 flex items-center gap-1.5 border-b pb-2"><User className="w-5 h-5 text-teal-700" /> Student Profile Details</h3>
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-1.5">
+                <User className="w-5 h-5 text-teal-700" /> Student Profile Details
+              </h3>
+              <button
+                type="button"
+                onClick={handleOpenEditModal}
+                className="bg-slate-100 hover:bg-teal-50 hover:text-teal-700 text-slate-700 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition border border-slate-200 shadow-2xs"
+              >
+                <Edit3 className="w-3.5 h-3.5" /> Edit Details
+              </button>
+            </div>
             
             <div className="flex flex-col sm:flex-row gap-6">
               <img 
@@ -574,6 +660,148 @@ const AdminMemberDetails = () => {
                 {actionLoading ? 'Deleting...' : 'Confirm Delete'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Member Details Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-y-auto no-print">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-5 my-8 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-teal-700" />
+                <h3 className="text-lg font-bold text-slate-800">Edit Student Details</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {editError && (
+              <div className="bg-red-50 text-red-700 border border-red-200 p-3 rounded-xl text-xs font-semibold">
+                {editError}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveEdit} className="space-y-4 text-xs font-semibold">
+              <div className="space-y-1">
+                <label className="text-slate-600 uppercase tracking-wider block">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={editFormData.fullName}
+                  onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
+                  placeholder="Student Full Name"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-slate-800 px-3.5 py-2.5 rounded-xl uppercase transition focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-slate-600 uppercase tracking-wider block">Admission Number (Ad. No)</label>
+                  <input
+                    type="text"
+                    value={editFormData.admissionNumber}
+                    onChange={(e) => setEditFormData({ ...editFormData, admissionNumber: e.target.value })}
+                    placeholder="e.g. 1098 (Optional)"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-slate-800 px-3.5 py-2.5 rounded-xl transition focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-slate-600 uppercase tracking-wider block">Place *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editFormData.place}
+                    onChange={(e) => setEditFormData({ ...editFormData, place: e.target.value })}
+                    placeholder="e.g. MORAYUR"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-slate-800 px-3.5 py-2.5 rounded-xl uppercase transition focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-slate-600 uppercase tracking-wider block">Phone Number *</label>
+                  <input
+                    type="tel"
+                    required
+                    value={editFormData.phone}
+                    onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                    placeholder="e.g. +91 9876543210"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-slate-800 px-3.5 py-2.5 rounded-xl transition focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-slate-600 uppercase tracking-wider block">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={editFormData.email}
+                    onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                    placeholder="student@example.com"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-slate-800 px-3.5 py-2.5 rounded-xl lowercase transition focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Sanad Course Selection */}
+              <div className="space-y-1.5 pt-1">
+                <label className="text-slate-600 uppercase tracking-wider block">Sanad Course</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl flex-1 hover:bg-slate-100 transition">
+                    <input
+                      type="checkbox"
+                      checked={editFormData.sand.umari}
+                      onChange={(e) => setEditFormData({
+                        ...editFormData,
+                        sand: { ...editFormData.sand, umari: e.target.checked }
+                      })}
+                      className="w-4 h-4 text-teal-700 rounded accent-teal-700"
+                    />
+                    <span className="text-slate-800 font-bold">Umari</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl flex-1 hover:bg-slate-100 transition">
+                    <input
+                      type="checkbox"
+                      checked={editFormData.sand.faizy}
+                      onChange={(e) => setEditFormData({
+                        ...editFormData,
+                        sand: { ...editFormData.sand, faizy: e.target.checked }
+                      })}
+                      className="w-4 h-4 text-teal-700 rounded accent-teal-700"
+                    />
+                    <span className="text-slate-800 font-bold">Faizy</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  disabled={editSaving}
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editSaving}
+                  className="px-5 py-2 bg-teal-700 hover:bg-teal-600 text-white font-bold rounded-xl shadow-md transition flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  {editSaving ? 'Saving Changes...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
